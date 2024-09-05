@@ -59,7 +59,7 @@ fn test_ledger_commands() {
 
     assert_eq!(id, wallet_policy.id());
 
-    let params = &AddressParams::ELEMENTS;
+    let params = &AddressParams::SEQUENTIA_REGTEST;
     let address = client
         .get_wallet_address(
             &wallet_policy,

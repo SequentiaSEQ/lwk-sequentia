@@ -161,7 +161,7 @@ fn jade_receive_address() {
     let result = jade.jade.get_receive_address(params).unwrap();
     let address = elements::Address::from_str(&result).unwrap();
     assert!(address.blinding_pubkey.is_some());
-    assert_eq!(address.params, &AddressParams::ELEMENTS);
+    assert_eq!(address.params, &AddressParams::SEQUENTIA_REGTEST);
 }
 
 #[test]
@@ -322,7 +322,7 @@ fn jade_register_multisig_check_address() {
         descriptor: derived_non_conf,
     };
     let address_desc = derived_conf
-        .address(&Secp256k1::new(), &AddressParams::ELEMENTS)
+        .address(&Secp256k1::new(), &AddressParams::SEQUENTIA_REGTEST)
         .unwrap();
 
     assert_eq!(address_desc, address_jade);

@@ -37,9 +37,9 @@ impl ElementsNetwork {
 
     pub fn address_params(&self) -> &'static AddressParams {
         match self {
-            ElementsNetwork::Liquid => &AddressParams::LIQUID,
-            ElementsNetwork::LiquidTestnet => &AddressParams::LIQUID_TESTNET,
-            ElementsNetwork::ElementsRegtest { .. } => &AddressParams::ELEMENTS,
+            ElementsNetwork::Liquid => &AddressParams::SEQUENTIA,
+            ElementsNetwork::LiquidTestnet => &AddressParams::SEQUENTIA_TESTNET,
+            ElementsNetwork::ElementsRegtest { .. } => &AddressParams::SEQUENTIA_REGTEST,
         }
     }
 

@@ -636,7 +636,7 @@ mod tests {
             master_blinding_key, xpub, checksum
         );
         let desc = ConfidentialDescriptor::<DefiniteDescriptorKey>::from_str(&desc_str).unwrap();
-        let addr = desc.address(&EC, &AddressParams::ELEMENTS).unwrap();
+        let addr = desc.address(&EC, &AddressParams::SEQUENTIA_REGTEST).unwrap();
         let expected_addr = "el1qqthj9zn320epzlcgd07kktp5ae2xgx82fkm42qqxaqg80l0fszueszj4mdsceqqfpv24x0cmkvd8awux8agrc32m9nj9sp0hk";
         assert_eq!(addr.to_string(), expected_addr.to_string());
     }
@@ -650,7 +650,7 @@ mod tests {
         let checksum = "h0ej28gv";
         let desc_str = format!("ct({},elwpkh({}))#{}", xprv, xpub, checksum);
         let desc = ConfidentialDescriptor::<DefiniteDescriptorKey>::from_str(&desc_str).unwrap();
-        let address = desc.address(&EC, &AddressParams::ELEMENTS).unwrap();
+        let address = desc.address(&EC, &AddressParams::SEQUENTIA_REGTEST).unwrap();
         // and extract the public blinding key
         let pk_from_addr = address.blinding_pubkey.unwrap();
 

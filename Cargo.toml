@@ -19,6 +19,8 @@ members = [
 resolver = "2"
 
 [patch.crates-io]
+elements = { version = "*", git = "https://github.com/SequentiaSEQ/rust-sequentia", rev = "c824a874aba0d1d298e2ce5da33a787893a320dc"}
+elements-miniscript = { git = "https://github.com/SequentiaSEQ/sequentia-miniscript", rev = "5a24391c59b3935a3d562d817c80614cceda5adf"}
 lwk_app = { path = "lwk_app" }
 lwk_common = { path = "lwk_common" }
 lwk_containers = { path = "lwk_containers" }
