@@ -36,7 +36,7 @@ impl Config {
             addr: consts::DEFAULT_ADDR.into(),
             datadir,
             electrum_url: "blockstream.info:465".into(),
-            network: ElementsNetwork::LiquidTestnet,
+            network: ElementsNetwork::SequentiaTestnet,
             tls: true,
             validate_domain: true,
             explorer_url: "https://blockstream.info/liquidtestnet/".into(),
@@ -52,7 +52,7 @@ impl Config {
             addr: consts::DEFAULT_ADDR.into(),
             datadir,
             electrum_url: "blockstream.info:995".into(),
-            network: ElementsNetwork::Liquid,
+            network: ElementsNetwork::Sequentia,
             tls: true,
             validate_domain: true,
             explorer_url: "https://blockstream.info/liquid/".into(),
@@ -72,7 +72,7 @@ impl Config {
             addr: consts::DEFAULT_ADDR.into(),
             datadir,
             electrum_url: "".into(),
-            network: ElementsNetwork::ElementsRegtest { policy_asset },
+            network: ElementsNetwork::SequentiaRegtest { policy_asset },
             tls: false,
             validate_domain: false,
             explorer_url: "".into(),
@@ -86,9 +86,9 @@ impl Config {
 
     pub fn jade_network(&self) -> JadeNetwork {
         match self.network {
-            ElementsNetwork::Liquid => JadeNetwork::Liquid,
-            ElementsNetwork::LiquidTestnet => JadeNetwork::TestnetLiquid,
-            ElementsNetwork::ElementsRegtest { .. } => JadeNetwork::LocaltestLiquid,
+            ElementsNetwork::Sequentia => JadeNetwork::Liquid,
+            ElementsNetwork::SequentiaTestnet => JadeNetwork::TestnetLiquid,
+            ElementsNetwork::SequentiaRegtest { .. } => JadeNetwork::LocaltestLiquid,
         }
     }
 
@@ -116,7 +116,7 @@ impl Config {
 
     /// True if Liquid mainnet
     pub fn is_mainnet(&self) -> bool {
-        matches!(self.network, ElementsNetwork::Liquid)
+        matches!(self.network, ElementsNetwork::Sequentia)
     }
 
     fn electrum_url(&self) -> lwk_wollet::ElectrumUrl {

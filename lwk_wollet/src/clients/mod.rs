@@ -307,7 +307,7 @@ mod tests {
             let tempdir = tempfile::tempdir().unwrap();
             let desc = desc_str.parse().unwrap();
             let mut wollet =
-                crate::Wollet::with_fs_persist(ElementsNetwork::LiquidTestnet, desc, &tempdir)
+                crate::Wollet::with_fs_persist(ElementsNetwork::SequentiaTestnet, desc, &tempdir)
                     .unwrap();
 
             let start = Instant::now();

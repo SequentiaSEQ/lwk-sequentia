@@ -188,11 +188,11 @@ mod test {
     #[test]
     fn test_validate() {
         let testnet_address = "tlq1qq2xvpcvfup5j8zscjq05u2wxxjcyewk7979f3mmz5l7uw5pqmx6xf5xy50hsn6vhkm5euwt72x878eq6zxx2z58hd7zrsg9qn";
-        let network = ElementsNetwork::LiquidTestnet;
+        let network = ElementsNetwork::SequentiaTestnet;
         let addr = validate_address(testnet_address, network).unwrap();
         assert_eq!(addr.to_string(), testnet_address);
 
-        let network = ElementsNetwork::Liquid;
+        let network = ElementsNetwork::Sequentia;
         assert!(validate_address(testnet_address, network).is_err())
     }
 }

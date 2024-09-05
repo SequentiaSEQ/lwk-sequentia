@@ -30,18 +30,18 @@ impl From<Network> for lwk_wollet::ElementsNetwork {
 impl Network {
     #[uniffi::constructor]
     pub fn mainnet() -> Arc<Network> {
-        Arc::new(lwk_wollet::ElementsNetwork::Liquid.into())
+        Arc::new(lwk_wollet::ElementsNetwork::Sequentia.into())
     }
 
     #[uniffi::constructor]
     pub fn testnet() -> Arc<Network> {
-        Arc::new(lwk_wollet::ElementsNetwork::LiquidTestnet.into())
+        Arc::new(lwk_wollet::ElementsNetwork::SequentiaTestnet.into())
     }
 
     #[uniffi::constructor]
     pub fn regtest(policy_asset: AssetId) -> Arc<Network> {
         Arc::new(
-            lwk_wollet::ElementsNetwork::ElementsRegtest {
+            lwk_wollet::ElementsNetwork::SequentiaRegtest {
                 policy_asset: policy_asset.into(),
             }
             .into(),
@@ -52,14 +52,14 @@ impl Network {
     pub fn regtest_default() -> Arc<Network> {
         let policy_asset = "5ac9f65c0efcc4775e0baec4ec03abdde22473cd3cf33c0419ca290e0751b225";
         let policy_asset: elements::AssetId = policy_asset.parse().expect("static");
-        Arc::new(lwk_wollet::ElementsNetwork::ElementsRegtest { policy_asset }.into())
+        Arc::new(lwk_wollet::ElementsNetwork::SequentiaRegtest { policy_asset }.into())
     }
 
     pub fn default_electrum_client(&self) -> Result<Arc<ElectrumClient>, LwkError> {
         let (url, validate_domain, tls) = match &self.inner {
-            lwk_wollet::ElementsNetwork::Liquid => ("blockstream.info:995", true, true),
-            lwk_wollet::ElementsNetwork::LiquidTestnet => ("blockstream.info:465", true, true),
-            lwk_wollet::ElementsNetwork::ElementsRegtest { policy_asset: _ } => {
+            lwk_wollet::ElementsNetwork::Sequentia => ("blockstream.info:995", true, true),
+            lwk_wollet::ElementsNetwork::SequentiaTestnet => ("blockstream.info:465", true, true),
+            lwk_wollet::ElementsNetwork::SequentiaRegtest { policy_asset: _ } => {
                 ("127.0.0.1:50002", false, false)
             }
         };
@@ -69,18 +69,18 @@ impl Network {
 
     pub fn default_esplora_client(&self) -> Arc<EsploraClient> {
         let url = match &self.inner {
-            lwk_wollet::ElementsNetwork::Liquid => "https://blockstream.info/liquid/api",
-            lwk_wollet::ElementsNetwork::LiquidTestnet => {
+            lwk_wollet::ElementsNetwork::Sequentia => "https://blockstream.info/liquid/api",
+            lwk_wollet::ElementsNetwork::SequentiaTestnet => {
                 "https://blockstream.info/liquidtestnet/api"
             }
-            lwk_wollet::ElementsNetwork::ElementsRegtest { policy_asset: _ } => "127.0.0.1:3000",
+            lwk_wollet::ElementsNetwork::SequentiaRegtest { policy_asset: _ } => "127.0.0.1:3000",
         };
 
         EsploraClient::new(url)
     }
 
     pub fn is_mainnet(&self) -> bool {
-        matches!(&self.inner, &lwk_wollet::ElementsNetwork::Liquid)
+        matches!(&self.inner, &lwk_wollet::ElementsNetwork::Sequentia)
     }
 
     pub fn policy_asset(&self) -> AssetId {

@@ -282,7 +282,7 @@ pub fn regtest_policy_asset() -> AssetId {
 
 pub fn network_regtest() -> ElementsNetwork {
     let policy_asset = regtest_policy_asset();
-    ElementsNetwork::ElementsRegtest { policy_asset }
+    ElementsNetwork::SequentiaRegtest { policy_asset }
 }
 
 pub fn new_unsupported_wallet(desc: &str, expected: Error) {
