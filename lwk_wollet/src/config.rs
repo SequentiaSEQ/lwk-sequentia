@@ -5,7 +5,7 @@ use std::str::FromStr;
 const LIQUID_POLICY_ASSET_STR: &str =
     "6f0279e9ed041c3d710a9f57d0c02928416460c4b722ae3457a11eec381c526d";
 const LIQUID_TESTNET_POLICY_ASSET_STR: &str =
-    "144c654344aa716d6f3abcc1ca90e5641e4e2a7f633bc09fe3baf64585819a49";
+    "c8eccacf0953e1931cd31e434d8319101cc36e6c38b0e2104d8687552fae3e40";
 
 #[derive(Debug, Clone, PartialEq, Eq, Copy, Hash)]
 pub enum ElementsNetwork {
@@ -29,9 +29,9 @@ impl ElementsNetwork {
 
     pub fn as_str(&self) -> &'static str {
         match self {
-            ElementsNetwork::Sequentia => "liquid",
-            ElementsNetwork::SequentiaTestnet => "liquid-testnet",
-            ElementsNetwork::SequentiaRegtest { .. } => "liquid-regtest",
+            ElementsNetwork::Sequentia => "mainnet",
+            ElementsNetwork::SequentiaTestnet => "testnet",
+            ElementsNetwork::SequentiaRegtest { .. } => "regtest",
         }
     }
 

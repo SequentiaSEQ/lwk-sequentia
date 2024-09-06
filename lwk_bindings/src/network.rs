@@ -58,7 +58,7 @@ impl Network {
     pub fn default_electrum_client(&self) -> Result<Arc<ElectrumClient>, LwkError> {
         let (url, validate_domain, tls) = match &self.inner {
             lwk_wollet::ElementsNetwork::Sequentia => ("blockstream.info:995", true, true),
-            lwk_wollet::ElementsNetwork::SequentiaTestnet => ("blockstream.info:465", true, true),
+            lwk_wollet::ElementsNetwork::SequentiaTestnet => ("127.0.0.1:50001", false, false),
             lwk_wollet::ElementsNetwork::SequentiaRegtest { policy_asset: _ } => {
                 ("127.0.0.1:50002", false, false)
             }

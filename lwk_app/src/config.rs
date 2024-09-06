@@ -37,7 +37,7 @@ impl Config {
             datadir,
             electrum_url: "blockstream.info:465".into(),
             network: ElementsNetwork::SequentiaTestnet,
-            tls: true,
+            tls: false,
             validate_domain: true,
             explorer_url: "https://blockstream.info/liquidtestnet/".into(),
             esplora_api_url: "https://blockstream.info/liquidtestnet/api/".into(),

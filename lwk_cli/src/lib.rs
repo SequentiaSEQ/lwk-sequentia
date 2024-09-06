@@ -50,9 +50,9 @@ pub fn inner_main(args: args::Cli) -> anyhow::Result<Value> {
 
     // TODO: improve network types conversion or comparison
     let (network, default_port) = match args.network {
-        Network::Mainnet => ("liquid", 32110),
-        Network::Testnet => ("liquid-testnet", 32111),
-        Network::Regtest => ("liquid-regtest", 32112),
+        Network::Mainnet => ("mainnet", 32110),
+        Network::Testnet => ("testnet", 32111),
+        Network::Regtest => ("regtest", 32112),
     };
 
     let addr = args
