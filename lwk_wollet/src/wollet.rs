@@ -679,7 +679,7 @@ mod tests {
         let desc: WolletDescriptor = format!("{}#{}", desc, desc_checksum(desc).unwrap())
             .parse()
             .unwrap();
-        Wollet::new(ElementsNetwork::LiquidTestnet, NoPersist::new(), desc).unwrap()
+        Wollet::new(ElementsNetwork::SequentiaTestnet, NoPersist::new(), desc).unwrap()
     }
 
     #[test]
@@ -753,13 +753,13 @@ mod tests {
         let mnemonic = lwk_test_util::TEST_MNEMONIC;
 
         for network in [
-            ElementsNetwork::Liquid,
-            ElementsNetwork::LiquidTestnet,
+            ElementsNetwork::Sequentia,
+            ElementsNetwork::SequentiaTestnet,
             ElementsNetwork::ElementsRegtest {
                 policy_asset: AssetId::default(),
             },
         ] {
-            let is_mainnet = matches!(network, ElementsNetwork::Liquid);
+            let is_mainnet = matches!(network, ElementsNetwork::Sequentia);
             let signer = SwSigner::new(mnemonic, is_mainnet).unwrap();
             for script_variant in [Singlesig::Wpkh, Singlesig::ShWpkh] {
                 for blinding_variant in [

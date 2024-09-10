@@ -35,12 +35,12 @@ impl Config {
         Self {
             addr: consts::DEFAULT_ADDR.into(),
             datadir,
-            electrum_url: "blockstream.info:465".into(),
-            network: ElementsNetwork::LiquidTestnet,
-            tls: true,
+            electrum_url: "89.216.21.96:51101".into(),
+            network: ElementsNetwork::SequentiaTestnet,
+            tls: false,
             validate_domain: true,
-            explorer_url: "https://blockstream.info/liquidtestnet/".into(),
-            esplora_api_url: "https://blockstream.info/liquidtestnet/api/".into(),
+            explorer_url: "https://89.216.21.96/testnet/".into(),
+            esplora_api_url: "https://89.216.21.96/testnet/api/".into(),
             registry_url: "https://assets-testnet.blockstream.info/".into(),
             timeout: TIMEOUT,
             scanning_interval: consts::SCANNING_INTERVAL,
@@ -52,7 +52,7 @@ impl Config {
             addr: consts::DEFAULT_ADDR.into(),
             datadir,
             electrum_url: "blockstream.info:995".into(),
-            network: ElementsNetwork::Liquid,
+            network: ElementsNetwork::Sequentia,
             tls: true,
             validate_domain: true,
             explorer_url: "https://blockstream.info/liquid/".into(),
@@ -86,8 +86,8 @@ impl Config {
 
     pub fn jade_network(&self) -> JadeNetwork {
         match self.network {
-            ElementsNetwork::Liquid => JadeNetwork::Liquid,
-            ElementsNetwork::LiquidTestnet => JadeNetwork::TestnetLiquid,
+            ElementsNetwork::Sequentia => JadeNetwork::Liquid,
+            ElementsNetwork::SequentiaTestnet => JadeNetwork::TestnetLiquid,
             ElementsNetwork::ElementsRegtest { .. } => JadeNetwork::LocaltestLiquid,
         }
     }
@@ -116,7 +116,7 @@ impl Config {
 
     /// True if Liquid mainnet
     pub fn is_mainnet(&self) -> bool {
-        matches!(self.network, ElementsNetwork::Liquid)
+        matches!(self.network, ElementsNetwork::Sequentia)
     }
 
     fn electrum_url(&self) -> lwk_wollet::ElectrumUrl {

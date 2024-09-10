@@ -304,7 +304,7 @@ mod test {
     fn test_encrypted_fs_persister() {
         let tempdir = tempfile::tempdir().unwrap();
         let desc = wollet_descriptor_test_vector();
-        let n = ElementsNetwork::LiquidTestnet;
+        let n = ElementsNetwork::SequentiaTestnet;
         let persister = FsPersister::new(&tempdir, n, &desc).unwrap();
         inner_test_persister(persister, true);
         let persister = FsPersister::new(&tempdir, n, &desc).unwrap();

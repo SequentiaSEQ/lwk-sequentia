@@ -30,12 +30,12 @@ impl From<Network> for lwk_wollet::ElementsNetwork {
 impl Network {
     #[uniffi::constructor]
     pub fn mainnet() -> Arc<Network> {
-        Arc::new(lwk_wollet::ElementsNetwork::Liquid.into())
+        Arc::new(lwk_wollet::ElementsNetwork::Sequentia.into())
     }
 
     #[uniffi::constructor]
     pub fn testnet() -> Arc<Network> {
-        Arc::new(lwk_wollet::ElementsNetwork::LiquidTestnet.into())
+        Arc::new(lwk_wollet::ElementsNetwork::SequentiaTestnet.into())
     }
 
     #[uniffi::constructor]
@@ -57,8 +57,8 @@ impl Network {
 
     pub fn default_electrum_client(&self) -> Result<Arc<ElectrumClient>, LwkError> {
         let (url, validate_domain, tls) = match &self.inner {
-            lwk_wollet::ElementsNetwork::Liquid => ("blockstream.info:995", true, true),
-            lwk_wollet::ElementsNetwork::LiquidTestnet => ("blockstream.info:465", true, true),
+            lwk_wollet::ElementsNetwork::Sequentia => ("blockstream.info:995", true, true),
+            lwk_wollet::ElementsNetwork::SequentiaTestnet => ("89.216.21.96:51101", false, false),
             lwk_wollet::ElementsNetwork::ElementsRegtest { policy_asset: _ } => {
                 ("127.0.0.1:50002", false, false)
             }
@@ -69,9 +69,9 @@ impl Network {
 
     pub fn default_esplora_client(&self) -> Arc<EsploraClient> {
         let url = match &self.inner {
-            lwk_wollet::ElementsNetwork::Liquid => "https://blockstream.info/liquid/api",
-            lwk_wollet::ElementsNetwork::LiquidTestnet => {
-                "https://blockstream.info/liquidtestnet/api"
+            lwk_wollet::ElementsNetwork::Sequentia => "https://blockstream.info/liquid/api",
+            lwk_wollet::ElementsNetwork::SequentiaTestnet => {
+                "https://89.216.21.96/testnet/api"
             }
             lwk_wollet::ElementsNetwork::ElementsRegtest { policy_asset: _ } => "127.0.0.1:3000",
         };
@@ -80,7 +80,7 @@ impl Network {
     }
 
     pub fn is_mainnet(&self) -> bool {
-        matches!(&self.inner, &lwk_wollet::ElementsNetwork::Liquid)
+        matches!(&self.inner, &lwk_wollet::ElementsNetwork::Sequentia)
     }
 
     pub fn policy_asset(&self) -> AssetId {
