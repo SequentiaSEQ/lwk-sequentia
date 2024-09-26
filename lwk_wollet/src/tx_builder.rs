@@ -1,4 +1,4 @@
-use std::collections::{HashMap, HashSet};
+use std::{collections::{HashMap, HashSet}, str::FromStr};
 
 use elements::{
     confidential::Value,
@@ -65,6 +65,7 @@ pub struct TxBuilder {
     network: ElementsNetwork,
     recipients: Vec<Recipient>,
     fee_rate: f32,
+    fee_asset: AssetId,
     issuance_request: IssuanceRequest,
     drain_lbtc: bool,
     drain_to: Option<Address>,
@@ -77,6 +78,7 @@ impl TxBuilder {
             network,
             recipients: vec![],
             fee_rate: 100.0,
+            fee_asset: AssetId::default(),
             issuance_request: IssuanceRequest::None,
             drain_lbtc: false,
             drain_to: None,
@@ -146,6 +148,14 @@ impl TxBuilder {
     pub fn fee_rate(mut self, fee_rate: Option<f32>) -> Self {
         if let Some(fee_rate) = fee_rate {
             self.fee_rate = fee_rate
+        }
+        self
+    }
+
+    /// Set custom fee asset
+    pub fn fee_asset(mut self, fee_asset: Option<String>) -> Self {
+        if let Some(fee_asset) = fee_asset {
+            self.fee_asset = elements::AssetId::from_str(&fee_asset).unwrap_or_default();
         }
         self
     }
@@ -250,11 +260,20 @@ impl TxBuilder {
 
         let mut inp_weight = 0;
 
-        let policy_asset = self.network().policy_asset();
-        let (addressees_lbtc, addressees_asset): (Vec<_>, Vec<_>) = self
-            .recipients
-            .into_iter()
-            .partition(|a| a.asset == policy_asset);
+        let mut fee_asset = self.fee_asset;
+
+        let addressees_asset: Vec<_> = self
+            .recipients;
+
+        if fee_asset == AssetId::default() {
+            fee_asset = addressees_asset[0].asset;
+        }
+
+        let addressees_fee_asset: Vec<_> = addressees_asset
+            .iter()
+            .filter(|a| a.asset == fee_asset)
+            .cloned()
+            .collect();
 
         // Assets inputs and outputs
         let assets: HashSet<_> = addressees_asset.iter().map(|a| a.asset).collect();
@@ -290,13 +309,13 @@ impl TxBuilder {
         // Fee and L-BTC change after (re)issuance
         let mut satoshi_out = 0;
         let mut satoshi_in = 0;
-        for addressee in addressees_lbtc {
+        for addressee in addressees_fee_asset {
             wollet.add_output(&mut pset, &addressee)?;
             satoshi_out += addressee.satoshi;
         }
 
-        // FIXME: For implementation simplicity now we always add all L-BTC inputs
-        for utxo in wollet.asset_utxos(&wollet.policy_asset())? {
+        // FIXME: For implementation simplicity now we always add all fee asset inputs
+        for utxo in wollet.asset_utxos(&fee_asset)? {
             wollet.add_input(&mut pset, &mut inp_txout_sec, &mut inp_weight, &utxo)?;
             satoshi_in += utxo.unblinded.value;
         }
@@ -408,17 +427,17 @@ impl TxBuilder {
         }
         let satoshi_change = satoshi_in - satoshi_out - temp_fee;
         let addressee = if let Some(address) = self.drain_to {
-            Recipient::from_address(satoshi_change, &address, wollet.policy_asset())
+            Recipient::from_address(satoshi_change, &address, fee_asset)
         } else {
             wollet.addressee_change(
                 satoshi_change,
-                wollet.policy_asset(),
+                fee_asset,
                 &mut last_unused_internal,
             )?
         };
         wollet.add_output(&mut pset, &addressee)?;
         let fee_output =
-            Output::new_explicit(Script::default(), temp_fee, wollet.policy_asset(), None);
+            Output::new_explicit(Script::default(), temp_fee, fee_asset, None);
         pset.add_output(fee_output);
 
         let weight = {
@@ -540,6 +559,14 @@ impl<'a> WolletTxBuilder<'a> {
         Self {
             wollet: self.wollet,
             inner: self.inner.fee_rate(fee_rate),
+        }
+    }
+
+    /// Wrapper of [`TxBuilder::fee_asset()`]
+    pub fn fee_asset(self, fee_asset: Option<String>) -> Self {
+        Self {
+            wollet: self.wollet,
+            inner: self.inner.fee_asset(fee_asset),
         }
     }
 

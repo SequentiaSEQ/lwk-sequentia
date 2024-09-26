@@ -512,6 +512,7 @@ fn inner_method_handler(request: Request, state: Arc<Mutex<State>>) -> Result<Re
                 .tx_builder()
                 .set_unvalidated_recipients(&recipients)?
                 .fee_rate(r.fee_rate)
+                .fee_asset(r.fee_asset)
                 .finish()?;
 
             add_contracts(&mut tx, s.assets.iter());

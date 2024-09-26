@@ -140,6 +140,9 @@ pub struct WalletSendMany {
 
     /// Optional fee rate in sat/vb
     pub fee_rate: Option<f32>,
+
+    /// Optional fee asset
+    pub fee_asset: Option<String>,
 }
 
 ///  An addressee which has yet to be validated
