@@ -287,7 +287,7 @@ impl TxBuilder {
             for utxo in wollet.asset_utxos(&asset)? {
                 wollet.add_input(&mut pset, &mut inp_txout_sec, &mut inp_weight, &utxo)?;
                 satoshi_in += utxo.unblinded.value;
-                if satoshi_in >= satoshi_out {
+                if asset != fee_asset && satoshi_in >= satoshi_out {
                     if satoshi_in > satoshi_out {
                         let satoshi_change = satoshi_in - satoshi_out;
                         let addressee = wollet.addressee_change(
@@ -310,17 +310,16 @@ impl TxBuilder {
         let mut satoshi_out = 0;
         let mut satoshi_in = 0;
         for addressee in addressees_fee_asset {
-            wollet.add_output(&mut pset, &addressee)?;
             satoshi_out += addressee.satoshi;
         }
 
         // FIXME: For implementation simplicity now we always add all fee asset inputs
         for utxo in wollet.asset_utxos(&fee_asset)? {
+            satoshi_in += utxo.unblinded.value;
             let already_added = pset.inputs().iter().filter(|a| a.previous_txid == utxo.outpoint.txid && a.previous_output_index == utxo.outpoint.vout);
             if already_added.count() == 0 {
                 wollet.add_input(&mut pset, &mut inp_txout_sec, &mut inp_weight, &utxo)?;
             }
-            satoshi_in += utxo.unblinded.value;
         }
 
         // Set (re)issuance data
