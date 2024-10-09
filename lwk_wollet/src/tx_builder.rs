@@ -319,8 +319,8 @@ impl TxBuilder {
             let already_added = pset.inputs().iter().filter(|a| a.previous_txid == utxo.outpoint.txid && a.previous_output_index == utxo.outpoint.vout);
             if already_added.count() == 0 {
                 wollet.add_input(&mut pset, &mut inp_txout_sec, &mut inp_weight, &utxo)?;
-                satoshi_in += utxo.unblinded.value;
             }
+            satoshi_in += utxo.unblinded.value;
         }
 
         // Set (re)issuance data
