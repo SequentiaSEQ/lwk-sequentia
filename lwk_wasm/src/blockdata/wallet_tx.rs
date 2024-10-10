@@ -1,4 +1,4 @@
-use crate::{OptionWalletTxOut, Transaction, Txid};
+use crate::{AssetId, OptionWalletTxOut, Transaction, Txid};
 use lwk_wollet::elements;
 use std::collections::HashMap;
 use wasm_bindgen::prelude::*;
@@ -43,6 +43,10 @@ impl WalletTx {
 
     pub fn fee(&self) -> u64 {
         self.inner.fee
+    }
+
+    pub fn fee_asset(&self) -> AssetId {
+        self.inner.fee_asset.into()
     }
 
     #[wasm_bindgen(js_name = txType)]

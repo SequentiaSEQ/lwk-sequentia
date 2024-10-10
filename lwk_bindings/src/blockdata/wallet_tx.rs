@@ -39,6 +39,10 @@ impl WalletTx {
         self.inner.fee
     }
 
+    pub fn fee_asset(&self) -> AssetId {
+        self.inner.fee_asset.into()
+    }
+
     pub fn type_(&self) -> String {
         self.inner.type_.clone()
     }

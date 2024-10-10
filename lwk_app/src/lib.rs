@@ -1211,6 +1211,7 @@ fn convert_tx(
             .map(|(k, v)| (k.to_string(), *v))
             .collect(),
         fee: tx.fee,
+        fee_asset: tx.fee_asset.to_string(),
         timestamp: tx.timestamp,
         type_: tx.type_.clone(),
         unblinded_url,
