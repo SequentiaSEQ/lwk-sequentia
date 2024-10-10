@@ -81,8 +81,8 @@ impl WalletTx {
 #[cfg(test)]
 mod tests {
     use crate::WalletTx;
-    use lwk_wollet::elements::{self, hex::FromHex, pset::serialize::Deserialize};
-    use std::collections::HashMap;
+    use lwk_wollet::elements::{self, hex::FromHex, pset::serialize::Deserialize, AssetId};
+    use std::{collections::HashMap, str::FromStr};
     use wasm_bindgen_test::*;
 
     #[wasm_bindgen_test]
@@ -113,6 +113,7 @@ mod tests {
             height: Some(4),
             balance: vec![(a, 10)].into_iter().collect(),
             fee: 23,
+            fee_asset: AssetId::from_str("5ac9f65c0efcc4775e0baec4ec03abdde22473cd3cf33c0419ca290e0751b225").unwrap(),
             type_: "type".to_string(),
             timestamp: Some(124),
             inputs: vec![Some(tx_out.clone())],
