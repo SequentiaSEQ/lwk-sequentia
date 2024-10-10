@@ -175,9 +175,9 @@ fn convert_pubkey(pk: crate::elements::secp256k1_zkp::PublicKey) -> BitcoinPubli
 pub(crate) fn validate_address(address: &str, network: ElementsNetwork) -> Result<Address, Error> {
     let params = network.address_params();
     let address = Address::parse_with_params(address, params)?;
-    // if address.blinding_pubkey.is_none() {
-    //     return Err(Error::NotConfidentialAddress);
-    // };
+    if address.blinding_pubkey.is_none() {
+        return Err(Error::NotConfidentialAddress);
+    };
     Ok(address)
 }
 
