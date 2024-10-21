@@ -449,8 +449,11 @@ impl TxBuilder {
             inp_weight + temp_pset.extract_tx()?.weight()
         };
 
+        let response = reqwest::blocking::get("http://explorer.sequentia.io:29256/getfeeexchangerates")?;
+        let exchange_rates: HashMap<String, u64> = response.json()?;
+        let fee_exchange_rate = exchange_rates.get(&fee_asset.to_string()).ok_or(Error::InvalidAmount)?.clone();
         let vsize = (weight + 4 - 1) / 4;
-        let fee = (vsize as f32 * self.fee_rate / 1000.0).ceil() as u64;
+        let fee = (vsize as f32 * self.fee_rate / 1000.0 / fee_exchange_rate as f32 * 100000000.0).ceil() as u64;
         if satoshi_in < (satoshi_out + temp_fee) {
             return Err(Error::InsufficientFunds);
         }
