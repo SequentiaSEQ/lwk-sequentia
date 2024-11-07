@@ -145,6 +145,8 @@ pub struct WalletSendMany {
     ///
     /// Note: this field will be removed once discounted CT will be enabled on all networks.
     pub enable_ct_discount: bool,
+    /// Optional fee asset
+    pub fee_asset: Option<String>,
 }
 
 ///  An addressee which has yet to be validated

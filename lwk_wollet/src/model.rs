@@ -48,6 +48,7 @@ pub struct WalletTx {
     pub height: Option<u32>,
     pub balance: BTreeMap<AssetId, i64>,
     pub fee: u64,
+    pub fee_asset: AssetId,
     pub type_: String,
     pub timestamp: Option<Timestamp>,
     pub inputs: Vec<Option<WalletTxOut>>,

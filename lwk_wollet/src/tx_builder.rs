@@ -1,4 +1,4 @@
-use std::collections::{HashMap, HashSet};
+use std::{collections::{HashMap, HashSet}, str::FromStr};
 
 use elements::{
     confidential::Value,
@@ -90,6 +90,7 @@ pub struct TxBuilder {
     recipients: Vec<Recipient>,
     fee_rate: f32,
     ct_discount: bool,
+    fee_asset: AssetId,
     issuance_request: IssuanceRequest,
     drain_lbtc: bool,
     drain_to: Option<Address>,
@@ -104,6 +105,7 @@ impl TxBuilder {
             recipients: vec![],
             fee_rate: 100.0,
             ct_discount: false,
+            fee_asset: AssetId::default(),
             issuance_request: IssuanceRequest::None,
             drain_lbtc: false,
             drain_to: None,
@@ -191,6 +193,14 @@ impl TxBuilder {
     /// Do not use ELIP200 discounted fees for Confidential Transactions
     pub fn disable_ct_discount(mut self) -> Self {
         self.ct_discount = false;
+        self
+    }
+
+    /// Set custom fee asset
+    pub fn fee_asset(mut self, fee_asset: Option<String>) -> Self {
+        if let Some(fee_asset) = fee_asset {
+            self.fee_asset = elements::AssetId::from_str(&fee_asset).unwrap_or_default();
+        }
         self
     }
 
@@ -310,11 +320,20 @@ impl TxBuilder {
 
         let mut inp_weight = 0;
 
-        let policy_asset = self.network().policy_asset();
-        let (addressees_lbtc, addressees_asset): (Vec<_>, Vec<_>) = self
-            .recipients
-            .into_iter()
-            .partition(|a| a.asset == policy_asset);
+        let mut fee_asset = self.fee_asset;
+
+        let addressees_asset: Vec<_> = self
+            .recipients;
+
+        if fee_asset == AssetId::default() {
+            fee_asset = addressees_asset[0].asset;
+        }
+
+        let addressees_fee_asset: Vec<_> = addressees_asset
+            .iter()
+            .filter(|a| a.asset == fee_asset)
+            .cloned()
+            .collect();
 
         // Assets inputs and outputs
         let assets: HashSet<_> = addressees_asset.iter().map(|a| a.asset).collect();
@@ -328,7 +347,7 @@ impl TxBuilder {
             for utxo in wollet.asset_utxos(&asset)? {
                 wollet.add_input(&mut pset, &mut inp_txout_sec, &mut inp_weight, &utxo)?;
                 satoshi_in += utxo.unblinded.value;
-                if satoshi_in >= satoshi_out {
+                if asset != fee_asset && satoshi_in >= satoshi_out {
                     if satoshi_in > satoshi_out {
                         let satoshi_change = satoshi_in - satoshi_out;
                         let addressee = wollet.addressee_change(
@@ -350,24 +369,17 @@ impl TxBuilder {
         // Fee and L-BTC change after (re)issuance
         let mut satoshi_out = 0;
         let mut satoshi_in = 0;
-        for addressee in addressees_lbtc {
-            wollet.add_output(&mut pset, &addressee)?;
+        for addressee in addressees_fee_asset {
             satoshi_out += addressee.satoshi;
         }
 
-        // Add all external L-BTC utxos
-        for utxo in &self.external_utxos {
-            if utxo.unblinded.asset != policy_asset {
-                continue;
+        // FIXME: For implementation simplicity now we always add all fee asset inputs
+        for utxo in wollet.asset_utxos(&fee_asset)? {
+            satoshi_in += utxo.unblinded.value;
+            let already_added = pset.inputs().iter().filter(|a| a.previous_txid == utxo.outpoint.txid && a.previous_output_index == utxo.outpoint.vout);
+            if already_added.count() == 0 {
+                wollet.add_input(&mut pset, &mut inp_txout_sec, &mut inp_weight, &utxo)?;
             }
-            add_external_input(&mut pset, &mut inp_txout_sec, &mut inp_weight, utxo);
-            satoshi_in += utxo.unblinded.value;
-        }
-
-        // FIXME: For implementation simplicity now we always add all L-BTC inputs
-        for utxo in wollet.asset_utxos(&wollet.policy_asset())? {
-            wollet.add_input(&mut pset, &mut inp_txout_sec, &mut inp_weight, &utxo)?;
-            satoshi_in += utxo.unblinded.value;
         }
 
         // Set (re)issuance data
@@ -477,17 +489,17 @@ impl TxBuilder {
         }
         let satoshi_change = satoshi_in - satoshi_out - temp_fee;
         let addressee = if let Some(address) = self.drain_to {
-            Recipient::from_address(satoshi_change, &address, wollet.policy_asset())
+            Recipient::from_address(satoshi_change, &address, fee_asset)
         } else {
             wollet.addressee_change(
                 satoshi_change,
-                wollet.policy_asset(),
+                fee_asset,
                 &mut last_unused_internal,
             )?
         };
         wollet.add_output(&mut pset, &addressee)?;
         let fee_output =
-            Output::new_explicit(Script::default(), temp_fee, wollet.policy_asset(), None);
+            Output::new_explicit(Script::default(), temp_fee, fee_asset, None);
         pset.add_output(fee_output);
 
         let weight = {
@@ -505,9 +517,12 @@ impl TxBuilder {
             inp_weight + tx_weight
         };
 
+        let response = reqwest::blocking::get("http://explorer.sequentia.io:29256/getfeeexchangerates")?;
+        let exchange_rates: HashMap<String, u64> = response.json()?;
+        let fee_exchange_rate = exchange_rates.get(&fee_asset.to_string()).ok_or(Error::InvalidAmount)?.clone();
         let vsize = (weight + 4 - 1) / 4;
-        let fee = (vsize as f32 * self.fee_rate / 1000.0).ceil() as u64;
-        if satoshi_in <= (satoshi_out + fee) {
+        let fee = (vsize as f32 * self.fee_rate / 1000.0 / fee_exchange_rate as f32 * 100000000.0).ceil() as u64;
+        if satoshi_in < (satoshi_out + fee) {
             return Err(Error::InsufficientFunds);
         }
         let satoshi_change = satoshi_in - satoshi_out - fee;
@@ -633,6 +648,14 @@ impl<'a> WolletTxBuilder<'a> {
         Self {
             wollet: self.wollet,
             inner: self.inner.disable_ct_discount(),
+        }
+    }
+
+    /// Wrapper of [`TxBuilder::fee_asset()`]
+    pub fn fee_asset(self, fee_asset: Option<String>) -> Self {
+        Self {
+            wollet: self.wollet,
+            inner: self.inner.fee_asset(fee_asset),
         }
     }
 

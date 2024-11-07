@@ -146,10 +146,12 @@ impl Client {
         addressees: Vec<UnvalidatedRecipient>,
         fee_rate: Option<f32>,
         enable_ct_discount: bool,
+        fee_asset: Option<String>,
     ) -> Result<response::Pset, Error> {
         let req = request::WalletSendMany {
             addressees: addressees.into_iter().map(unvalidate_addressee).collect(),
             fee_rate,
+            fee_asset,
             name,
             enable_ct_discount,
         };

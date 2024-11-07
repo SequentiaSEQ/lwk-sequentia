@@ -359,8 +359,8 @@ impl Wollet {
     ) -> Result<BitcoinAddressResult, Error> {
         let index = self.unwrap_or_last_unused(index);
         let network = match self.network() {
-            ElementsNetwork::Liquid => bitcoin::Network::Bitcoin,
-            ElementsNetwork::LiquidTestnet => bitcoin::Network::Testnet,
+            ElementsNetwork::Sequentia => bitcoin::Network::Bitcoin,
+            ElementsNetwork::SequentiaTestnet => bitcoin::Network::Testnet,
             ElementsNetwork::ElementsRegtest { policy_asset: _ } => bitcoin::Network::Regtest,
         };
 
@@ -547,9 +547,9 @@ impl Wollet {
                 // ignore this transaction
                 continue;
             }
-            let fee = tx_fee(tx);
             let policy_asset = self.policy_asset();
-            let type_ = tx_type(tx, &policy_asset, &balance, fee);
+            let fee_pair = tx_fee(tx, policy_asset);
+            let type_ = tx_type(tx, &policy_asset, &balance, fee_pair.0);
             let timestamp = height.and_then(|h| self.store.cache.timestamps.get(&h).cloned());
             let inputs = tx_inputs(tx, &txos);
             let outputs = tx_outputs(**txid, tx, &txos);
@@ -558,7 +558,8 @@ impl Wollet {
                 txid: **txid,
                 height: **height,
                 balance,
-                fee,
+                fee: fee_pair.0,
+                fee_asset: fee_pair.1,
                 type_,
                 timestamp,
                 inputs,
@@ -577,9 +578,9 @@ impl Wollet {
             let txos = self.txos()?;
 
             let balance = tx_balance(*txid, tx, &txos);
-            let fee = tx_fee(tx);
             let policy_asset = self.policy_asset();
-            let type_ = tx_type(tx, &policy_asset, &balance, fee);
+            let fee_pair = tx_fee(tx,policy_asset);
+            let type_ = tx_type(tx, &policy_asset, &balance, fee_pair.0);
             let timestamp = height.and_then(|h| self.store.cache.timestamps.get(&h).cloned());
             let inputs = tx_inputs(tx, &txos);
             let outputs = tx_outputs(*txid, tx, &txos);
@@ -589,7 +590,8 @@ impl Wollet {
                 txid: *txid,
                 height: *height,
                 balance,
-                fee,
+                fee: fee_pair.0,
+                fee_asset: fee_pair.1,
                 type_,
                 timestamp,
                 inputs,
@@ -797,12 +799,14 @@ pub fn full_scan_with_electrum_client(
     Ok(())
 }
 
-fn tx_fee(tx: &Transaction) -> u64 {
+fn tx_fee(tx: &Transaction, policy_asset: AssetId) -> (u64, AssetId) {
     tx.output
         .iter()
         .filter(|o| o.script_pubkey.is_empty())
-        .map(|o| o.value.explicit().unwrap_or(0))
-        .sum()
+        .map(|o| (o.value.explicit().unwrap_or(0), o.asset.explicit()))
+        .fold((0, policy_asset.clone()), |(fee_sum, _), (value, asset)| {
+            (fee_sum + value, asset.unwrap_or(policy_asset))
+        })
 }
 
 /// Get a string that hopefully defines the transaction type.
@@ -954,7 +958,7 @@ mod tests {
         let desc: WolletDescriptor = format!("{}#{}", desc, desc_checksum(desc).unwrap())
             .parse()
             .unwrap();
-        Wollet::new(ElementsNetwork::LiquidTestnet, NoPersist::new(), desc).unwrap()
+        Wollet::new(ElementsNetwork::SequentiaTestnet, NoPersist::new(), desc).unwrap()
     }
 
     #[test]
@@ -1028,13 +1032,13 @@ mod tests {
         let mnemonic = lwk_test_util::TEST_MNEMONIC;
 
         for network in [
-            ElementsNetwork::Liquid,
-            ElementsNetwork::LiquidTestnet,
+            ElementsNetwork::Sequentia,
+            ElementsNetwork::SequentiaTestnet,
             ElementsNetwork::ElementsRegtest {
                 policy_asset: AssetId::default(),
             },
         ] {
-            let is_mainnet = matches!(network, ElementsNetwork::Liquid);
+            let is_mainnet = matches!(network, ElementsNetwork::Sequentia);
             let signer = SwSigner::new(mnemonic, is_mainnet).unwrap();
             for script_variant in [Singlesig::Wpkh, Singlesig::ShWpkh] {
                 for blinding_variant in [

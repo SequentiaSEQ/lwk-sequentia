@@ -489,6 +489,7 @@ pub enum WalletCommand {
         /// Note: this field will be removed once discounted CT will be enabled on all networks.
         #[arg(long)]
         enable_ct_discount: bool,
+        fee_asset: Option<String>,
     },
 
     /// Drain the wallet of the policy asset

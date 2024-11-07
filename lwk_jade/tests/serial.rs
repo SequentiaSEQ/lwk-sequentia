@@ -79,5 +79,5 @@ fn receive_address() {
     let result = jade_api.get_receive_address(params).unwrap();
     let address = elements::Address::from_str(&result).unwrap();
     assert!(address.blinding_pubkey.is_some());
-    assert_eq!(address.params, &elements::AddressParams::LIQUID_TESTNET);
+    assert_eq!(address.params, &elements::AddressParams::SEQUENTIA_TESTNET);
 }
