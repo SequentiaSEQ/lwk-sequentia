@@ -732,7 +732,7 @@ dependencies = [
 [[package]]
 name = "elements-miniscript"
 version = "0.3.1"
-source = "git+https://github.com/SequentiaSEQ/sequentia-miniscript"
+source = "git+https://github.com/SequentiaSEQ/sequentia-miniscript?branch=test"
 dependencies = [
  "bitcoin",
  "elements",
