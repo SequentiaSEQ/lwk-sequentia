@@ -79,7 +79,7 @@ impl Network {
         let url = match &self.inner {
             lwk_wollet::ElementsNetwork::Sequentia => "https://blockstream.info/liquid/api",
             lwk_wollet::ElementsNetwork::SequentiaTestnet => {
-                "https://b89.216.21.96/testnet/api"
+                "http://explorer.sequentia.io/testnet/api"
             }
             lwk_wollet::ElementsNetwork::ElementsRegtest { policy_asset: _ } => "127.0.0.1:3000",
         };
@@ -111,7 +111,7 @@ impl Network {
     pub fn default_explorer_url(&self) -> String {
         let url = match &self.inner {
             lwk_wollet::ElementsNetwork::Sequentia => "https://blockstream.info/liquid/",
-            lwk_wollet::ElementsNetwork::SequentiaTestnet => "https://89.216.21.96/testnet/",
+            lwk_wollet::ElementsNetwork::SequentiaTestnet => "http://explorer.sequentia.io/testnet/",
             lwk_wollet::ElementsNetwork::ElementsRegtest { policy_asset: _ } => "127.0.0.1:3000",
         };
         url.to_string()
