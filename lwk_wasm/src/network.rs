@@ -37,8 +37,8 @@ impl From<&Network> for lwk_wollet::ElementsNetwork {
 impl From<Network> for lwk_jade::Network {
     fn from(value: Network) -> Self {
         match value.inner {
-            lwk_wollet::ElementsNetwork::Liquid => lwk_jade::Network::Liquid,
-            lwk_wollet::ElementsNetwork::LiquidTestnet => lwk_jade::Network::TestnetLiquid,
+            lwk_wollet::ElementsNetwork::Sequentia => lwk_jade::Network::Liquid,
+            lwk_wollet::ElementsNetwork::SequentiaTestnet => lwk_jade::Network::TestnetLiquid,
             lwk_wollet::ElementsNetwork::ElementsRegtest { .. } => {
                 lwk_jade::Network::LocaltestLiquid
             }
@@ -50,12 +50,12 @@ impl From<Network> for lwk_jade::Network {
 impl Network {
     /// Creates a mainnet `Network``
     pub fn mainnet() -> Network {
-        lwk_wollet::ElementsNetwork::Liquid.into()
+        lwk_wollet::ElementsNetwork::Sequentia.into()
     }
 
     /// Creates a testnet `Network``
     pub fn testnet() -> Network {
-        lwk_wollet::ElementsNetwork::LiquidTestnet.into()
+        lwk_wollet::ElementsNetwork::SequentiaTestnet.into()
     }
 
     /// Creates a regtest `Network``
@@ -77,9 +77,9 @@ impl Network {
     #[wasm_bindgen(js_name = defaultEsploraClient)]
     pub fn default_esplora_client(&self) -> EsploraClient {
         let url = match &self.inner {
-            lwk_wollet::ElementsNetwork::Liquid => "https://blockstream.info/liquid/api",
-            lwk_wollet::ElementsNetwork::LiquidTestnet => {
-                "https://blockstream.info/liquidtestnet/api"
+            lwk_wollet::ElementsNetwork::Sequentia => "https://blockstream.info/liquid/api",
+            lwk_wollet::ElementsNetwork::SequentiaTestnet => {
+                "https://b89.216.21.96/testnet/api"
             }
             lwk_wollet::ElementsNetwork::ElementsRegtest { policy_asset: _ } => "127.0.0.1:3000",
         };
@@ -89,7 +89,7 @@ impl Network {
 
     #[wasm_bindgen(js_name = isMainnet)]
     pub fn is_mainnet(&self) -> bool {
-        matches!(&self.inner, &lwk_wollet::ElementsNetwork::Liquid)
+        matches!(&self.inner, &lwk_wollet::ElementsNetwork::Sequentia)
     }
 
     #[wasm_bindgen(js_name = toString)]
@@ -110,8 +110,8 @@ impl Network {
     #[wasm_bindgen(js_name = defaultExplorerUrl)]
     pub fn default_explorer_url(&self) -> String {
         let url = match &self.inner {
-            lwk_wollet::ElementsNetwork::Liquid => "https://blockstream.info/liquid/",
-            lwk_wollet::ElementsNetwork::LiquidTestnet => "https://blockstream.info/liquidtestnet/",
+            lwk_wollet::ElementsNetwork::Sequentia => "https://blockstream.info/liquid/",
+            lwk_wollet::ElementsNetwork::SequentiaTestnet => "https://89.216.21.96/testnet/",
             lwk_wollet::ElementsNetwork::ElementsRegtest { policy_asset: _ } => "127.0.0.1:3000",
         };
         url.to_string()

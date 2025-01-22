@@ -61,7 +61,7 @@ impl Address {
 
     #[wasm_bindgen(js_name = isMainnet)]
     pub fn is_mainnet(&self) -> bool {
-        self.inner.params == &AddressParams::LIQUID
+        self.inner.params == &AddressParams::SEQUENTIA
     }
 
     #[wasm_bindgen(js_name = toUnconfidential)]

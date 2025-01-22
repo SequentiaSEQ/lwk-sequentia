@@ -351,6 +351,9 @@ pub struct Tx {
     /// Fee
     pub fee: u64,
 
+    /// Fee asset
+    pub fee_asset: String,
+
     /// Type
     #[serde(rename = "type")]
     pub type_: String,

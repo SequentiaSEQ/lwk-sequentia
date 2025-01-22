@@ -16,7 +16,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Parse the descriptor and create the watch only wallet
     let descriptor: WolletDescriptor = desc.parse()?;
     let mut wollet = Wollet::new(
-        ElementsNetwork::LiquidTestnet,
+        ElementsNetwork::SequentiaTestnet,
         NoPersist::new(), // Do not persist data
         descriptor,
     )?;

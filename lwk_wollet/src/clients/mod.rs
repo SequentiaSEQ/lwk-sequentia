@@ -116,7 +116,7 @@ mod tests {
         let desc_str = lwk_test_util::TEST_DESCRIPTOR;
 
         let urls = [
-            LIQUID_TESTNET_SOCKET,
+            SEQUENTIA_TESTNET_SOCKET,
             "https://blockstream.info/liquidtestnet/api",
             "https://liquid.network/liquidtestnet/api",
         ];
@@ -133,7 +133,7 @@ mod tests {
             let tempdir = tempfile::tempdir().unwrap();
             let desc = desc_str.parse().unwrap();
             let mut wollet =
-                crate::Wollet::with_fs_persist(ElementsNetwork::LiquidTestnet, desc, &tempdir)
+                crate::Wollet::with_fs_persist(ElementsNetwork::SequentiaTestnet, desc, &tempdir)
                     .unwrap();
 
             let start = Instant::now();

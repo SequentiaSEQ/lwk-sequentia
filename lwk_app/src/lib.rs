@@ -550,7 +550,8 @@ fn inner_method_handler(request: Request, state: Arc<Mutex<State>>) -> Result<Re
             let mut builder = wollet
                 .tx_builder()
                 .set_unvalidated_recipients(&recipients)?
-                .fee_rate(r.fee_rate);
+                .fee_rate(r.fee_rate)
+                .fee_asset(r.fee_asset);
             if r.enable_ct_discount {
                 builder = builder.enable_ct_discount();
             }
@@ -1302,6 +1303,7 @@ fn convert_tx(
             .map(|(k, v)| (k.to_string(), *v))
             .collect(),
         fee: tx.fee,
+        fee_asset: tx.fee_asset.to_string(),
         timestamp: tx.timestamp,
         type_: tx.type_.clone(),
         unblinded_url,
