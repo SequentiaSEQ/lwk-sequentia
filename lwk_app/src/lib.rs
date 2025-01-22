@@ -1161,7 +1161,7 @@ fn inner_method_handler(request: Request, state: Arc<Mutex<State>>) -> Result<Re
         Method::Amp2Descriptor => {
             let r: request::Amp2Descriptor = serde_json::from_value(params)?;
             let mut s = state.lock()?;
-            if !matches!(s.config.network, lwk_wollet::ElementsNetwork::LiquidTestnet) {
+            if !matches!(s.config.network, lwk_wollet::ElementsNetwork::SequentiaTestnet) {
                 return Err(Error::Generic(
                     "AMP2 methods are not available for this network".into(),
                 ));
@@ -1178,7 +1178,7 @@ fn inner_method_handler(request: Request, state: Arc<Mutex<State>>) -> Result<Re
         Method::Amp2Register => {
             let r: request::Amp2Register = serde_json::from_value(params)?;
             let mut s = state.lock()?;
-            if !matches!(s.config.network, lwk_wollet::ElementsNetwork::LiquidTestnet) {
+            if !matches!(s.config.network, lwk_wollet::ElementsNetwork::SequentiaTestnet) {
                 return Err(Error::Generic(
                     "AMP2 methods are not available for this network".into(),
                 ));
@@ -1195,7 +1195,7 @@ fn inner_method_handler(request: Request, state: Arc<Mutex<State>>) -> Result<Re
         Method::Amp2Cosign => {
             let r: request::Amp2Cosign = serde_json::from_value(params)?;
             let s = state.lock()?;
-            if !matches!(s.config.network, lwk_wollet::ElementsNetwork::LiquidTestnet) {
+            if !matches!(s.config.network, lwk_wollet::ElementsNetwork::SequentiaTestnet) {
                 return Err(Error::Generic(
                     "AMP2 methods are not available for this network".into(),
                 ));

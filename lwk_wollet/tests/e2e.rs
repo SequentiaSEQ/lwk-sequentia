@@ -1301,7 +1301,7 @@ fn test_fetch_full_header_mainnet() {
 fn test_fetch_full_header_testnet() {
     let electrum_url = ElectrumUrl::new(SEQUENTIA_TESTNET_SOCKET, true, true).unwrap();
     let electrum_client = ElectrumClient::new(&electrum_url).unwrap();
-    test_fetch_last_full_header(electrum_client, ElementsNetwork::LiquidTestnet);
+    test_fetch_last_full_header(electrum_client, ElementsNetwork::SequentiaTestnet);
 }
 
 fn test_fetch_last_full_header(mut client: ElectrumClient, network: ElementsNetwork) {

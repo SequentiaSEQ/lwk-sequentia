@@ -130,7 +130,7 @@ mod tests {
     #[wasm_bindgen_test]
     async fn test_network() {
         assert_eq!(Network::mainnet().to_string(), "Liquid");
-        assert_eq!(Network::testnet().to_string(), "LiquidTestnet");
+        assert_eq!(Network::testnet().to_string(), "SequentiaTestnet");
         assert_eq!(Network::regtest_default().to_string(), "ElementsRegtest { policy_asset: 5ac9f65c0efcc4775e0baec4ec03abdde22473cd3cf33c0419ca290e0751b225 }");
     }
 }

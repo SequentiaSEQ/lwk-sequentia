@@ -678,7 +678,7 @@ mod tests {
 
     async fn test_esplora_url(esplora_url: &str) {
         let network = if esplora_url.contains("liquidtestnet") {
-            ElementsNetwork::LiquidTestnet
+            ElementsNetwork::SequentiaTestnet
         } else if esplora_url.contains("liquid") {
             ElementsNetwork::Liquid
         } else {

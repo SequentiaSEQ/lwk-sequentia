@@ -627,7 +627,7 @@ mod test {
         let update_bytes = lwk_test_util::update_test_vector_2_bytes();
         let update = Update::deserialize(&update_bytes).unwrap();
         let desc: WolletDescriptor = lwk_test_util::wollet_descriptor_string().parse().unwrap();
-        let wollet = Wollet::without_persist(crate::ElementsNetwork::LiquidTestnet, desc).unwrap();
+        let wollet = Wollet::without_persist(crate::ElementsNetwork::SequentiaTestnet, desc).unwrap();
         assert_eq!(update.serialize().unwrap().len(), 18444);
         let update_pruned = {
             let mut u = update.clone();

@@ -373,6 +373,15 @@ impl TxBuilder {
             satoshi_out += addressee.satoshi;
         }
 
+         // Add all external L-BTC utxos
+         for utxo in &self.external_utxos {
+            if utxo.unblinded.asset != fee_asset {
+                continue;
+            }
+            add_external_input(&mut pset, &mut inp_txout_sec, &mut inp_weight, utxo);
+            satoshi_in += utxo.unblinded.value;
+        }
+
         // FIXME: For implementation simplicity now we always add all fee asset inputs
         for utxo in wollet.asset_utxos(&fee_asset)? {
             satoshi_in += utxo.unblinded.value;
