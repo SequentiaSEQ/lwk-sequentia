@@ -1,14 +1,35 @@
+use elements::bitcoin::PublicKey;
+use elements::hashes::hex::FromHex;
 use lwk_wollet::NoPersist;
 
 use crate::desc::WolletDescriptor;
 use crate::network::Network;
 use crate::types::AssetId;
 use crate::{AddressResult, ForeignPersisterLink, LwkError, Pset, Txid, Update, WalletTx};
+use std::fmt;
+use std::str::FromStr;
 use std::sync::{MutexGuard, PoisonError};
 use std::{
     collections::HashMap,
     sync::{Arc, Mutex},
 };
+
+#[derive(uniffi::Object, PartialEq, Eq, Debug)]
+pub struct HTLCScript {
+    inner: lwk_wollet::HTLC,
+}
+
+impl From<lwk_wollet::HTLC> for HTLCScript {
+    fn from(inner: lwk_wollet::HTLC) -> Self {
+        Self { inner }
+    }
+}
+
+impl fmt::Display for HTLCScript {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}", self.inner)
+    }
+}
 
 /// A Watch-Only wallet, wrapper over [`lwk_wollet::Wollet`]
 #[derive(uniffi::Object)]
@@ -103,6 +124,16 @@ impl Wollet {
         let wollet = self.inner.lock()?;
         wollet.finalize(&mut pset)?;
         Ok(Arc::new(pset.into()))
+    }
+
+    pub fn create_htlc(&self, receiver_pubkey: &str, owner_pubkey: &str, timeout: u32, seed_hash: Option<std::string::String>) -> Result<Arc<HTLCScript>, LwkError> {
+        let wollet = self.inner.lock()?;
+        let seedhash = match seed_hash {
+            Some(seed) => Some(Vec::from_hex(&seed).unwrap()),
+            None => None,
+        };
+        let htlc = wollet.create_htlc(PublicKey::from_str(receiver_pubkey).unwrap(), PublicKey::from_str(owner_pubkey).unwrap(), timeout, seedhash);
+        Ok(Arc::new(htlc.unwrap().into()))
     }
 
     /// Note this a test method but we are not feature gating in test because we need it in

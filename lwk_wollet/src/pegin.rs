@@ -48,7 +48,7 @@ mod test {
     #[test]
     fn test_height_with_fed_peg_script() {
         assert_eq!(
-            height_with_fed_peg_script(ElementsNetwork::Liquid, 2_963_521),
+            height_with_fed_peg_script(ElementsNetwork::Sequentia, 2_963_521),
             2_963_520
         );
     }

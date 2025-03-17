@@ -5,6 +5,7 @@ use crate::secp256k1::PublicKey;
 use crate::store::Timestamp;
 use crate::{ElementsNetwork, Error};
 use elements::bitcoin;
+use elements::hashes::hex::DisplayHex;
 use lwk_common::burn_script;
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
@@ -279,6 +280,38 @@ impl WalletTx {
             explorer_url,
             &self.txid,
             DisplayWalletTxInputOutputs(self)
+        )
+    }
+}
+
+#[derive(PartialEq, Eq, Clone, Serialize, Deserialize)]
+pub struct HTLC {
+    pub address: String,
+    pub redeem_script: Vec<u8>,
+    pub seed_hash: Vec<u8>,
+    pub seed: Option<Vec<u8>>,
+}
+
+impl std::fmt::Debug for HTLC {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("HTLC")
+            .field("address", &self.address)
+            .field("redeem_script", &self.redeem_script.to_lower_hex_string())
+            .field("seed_hash", &self.seed_hash.to_lower_hex_string())
+            .field("seed", &self.seed.as_ref().map(|s| s.to_lower_hex_string()))
+            .finish()
+    }
+}
+
+impl std::fmt::Display for HTLC {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(
+            f,
+            "HTLC(address={}, redeem_script={}, seed_hash={}, seed={:?})",
+            self.address,
+            self.redeem_script.to_lower_hex_string(),
+            self.seed_hash.to_lower_hex_string(),
+            self.seed.as_ref().map(|s| s.to_lower_hex_string())
         )
     }
 }

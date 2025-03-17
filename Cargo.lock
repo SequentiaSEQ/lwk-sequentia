@@ -1000,7 +1000,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "33d852cb9b869c2a9b3df2f71a3074817f01e1844f839a144f5fcef059a4eb5d"
 dependencies = [
  "libc",
- "windows-sys 0.52.0",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -2213,6 +2213,26 @@ dependencies = [
 ]
 
 [[package]]
+name = "minicbor"
+version = "0.23.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0ded7eb446d01ad767689ff97ac883a548f6e0d266f20a8cb593b67c9d2590b3"
+dependencies = [
+ "minicbor-derive",
+]
+
+[[package]]
+name = "minicbor-derive"
+version = "0.14.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8f29ac9686ec36cb5c82e866f97eaa67e299bf4ecab0c152f2860e1145be468e"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.90",
+]
+
+[[package]]
 name = "minicov"
 version = "0.3.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2681,7 +2701,7 @@ dependencies = [
  "once_cell",
  "socket2",
  "tracing",
- "windows-sys 0.52.0",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -2902,7 +2922,7 @@ dependencies = [
  "errno",
  "libc",
  "linux-raw-sys",
- "windows-sys 0.52.0",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -3496,7 +3516,7 @@ dependencies = [
  "fastrand",
  "once_cell",
  "rustix",
- "windows-sys 0.52.0",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -4080,13 +4100,13 @@ dependencies = [
 
 [[package]]
 name = "waterfalls"
-version = "0.4.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1e7c194fd4a1f959a4ace5437744ff53ff677d798f61d55cf363b21c72827094"
+version = "0.5.2"
+source = "git+https://github.com/SequentiaSEQ/waterfalls-sequentia?branch=sequentia-testnet#773899f63a2a51f2f2b3dd453e8449b42b79ba7d"
 dependencies = [
  "age",
  "anyhow",
  "base64 0.21.7",
+ "bitcoin",
  "bitcoind",
  "clap",
  "elements",
@@ -4100,6 +4120,7 @@ dependencies = [
  "hyper-util",
  "lazy_static",
  "log",
+ "minicbor",
  "prometheus",
  "reqwest",
  "serde",
@@ -4185,7 +4206,7 @@ version = "0.1.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cf221c93e13a30d793f7645a0e7762c55d169dbb0a49671918a2319d289b10bb"
 dependencies = [
- "windows-sys 0.48.0",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]

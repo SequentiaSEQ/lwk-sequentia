@@ -1,6 +1,6 @@
 use std::sync::{MutexGuard, PoisonError};
 
-use elements::pset::ParseError;
+use elements::{bitcoin::key::FromSliceError, pset::ParseError};
 
 /// Possible errors emitted
 #[derive(uniffi::Error, thiserror::Error, Debug)]
@@ -156,6 +156,14 @@ impl From<lwk_wollet::elements_miniscript::psbt::Error> for LwkError {
     fn from(value: lwk_wollet::elements_miniscript::psbt::Error) -> Self {
         LwkError::Generic {
             msg: format!("{:?}", value),
+        }
+    }
+}
+
+impl From<FromSliceError> for LwkError {
+    fn from(err: FromSliceError) -> Self {
+        LwkError::Generic {
+            msg: format!("{:?}", err),
         }
     }
 }

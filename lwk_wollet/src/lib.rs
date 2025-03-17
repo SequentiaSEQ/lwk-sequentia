@@ -105,7 +105,7 @@ pub use crate::config::ElementsNetwork;
 pub use crate::descriptor::{Chain, WolletDescriptor};
 pub use crate::error::Error;
 pub use crate::model::{
-    AddressResult, ExternalUtxo, IssuanceDetails, Recipient, UnvalidatedRecipient, WalletTx,
+    AddressResult, HTLC, ExternalUtxo, IssuanceDetails, Recipient, UnvalidatedRecipient, WalletTx,
     WalletTxOut,
 };
 pub use crate::pegin::fed_peg_script;

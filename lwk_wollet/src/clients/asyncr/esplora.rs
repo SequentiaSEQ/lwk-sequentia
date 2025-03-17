@@ -680,7 +680,7 @@ mod tests {
         let network = if esplora_url.contains("liquidtestnet") {
             ElementsNetwork::SequentiaTestnet
         } else if esplora_url.contains("liquid") {
-            ElementsNetwork::Liquid
+            ElementsNetwork::Sequentia
         } else {
             ElementsNetwork::default_regtest()
         };

@@ -21,6 +21,7 @@ resolver = "2"
 [patch.crates-io]
 elements = { version = "*", git = "https://github.com/SequentiaSEQ/rust-sequentia", branch = "sequentia-testnet"}
 elements-miniscript = { version = "*", git = "https://github.com/SequentiaSEQ/sequentia-miniscript", branch = "sequentia-testnet"}
+waterfalls = { version = "*", git = "https://github.com/SequentiaSEQ/waterfalls-sequentia", branch = "sequentia-testnet"}
 lwk_app = { path = "lwk_app" }
 lwk_common = { path = "lwk_common" }
 lwk_containers = { path = "lwk_containers" }

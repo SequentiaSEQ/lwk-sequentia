@@ -7,22 +7,28 @@ use crate::elements::pset::PartiallySignedTransaction;
 use crate::elements::secp256k1_zkp::ZERO_TWEAK;
 use crate::elements::{AssetId, BlockHash, OutPoint, Script, Transaction, TxOutSecrets, Txid};
 use crate::error::Error;
-use crate::hashes::Hash;
 use crate::model::{
-    AddressResult, BitcoinAddressResult, ExternalUtxo, IssuanceDetails, WalletTx, WalletTxOut,
+    AddressResult, BitcoinAddressResult, HTLC, ExternalUtxo, IssuanceDetails, WalletTx, WalletTxOut,
 };
 use crate::persister::PersistError;
 use crate::store::{Height, ScriptBatch, Store, Timestamp, BATCH_SIZE};
 use crate::tx_builder::{extract_issuances, WolletTxBuilder};
 use crate::util::EC;
 use crate::{FsPersister, NoPersist, Persister, Update, WolletDescriptor};
-use elements::bitcoin;
-use elements::bitcoin::bip32::ChildNumber;
+use elements::{
+    Address,
+    bitcoin,
+    bitcoin::bip32::ChildNumber,
+    hashes::{sha256, Hash, HashEngine},
+    opcodes::all::{OP_CSV, OP_IF, OP_SHA256, OP_EQUALVERIFY, OP_CHECKSIG, OP_DROP, OP_ELSE, OP_ENDIF},
+    script::Builder,
+};
 use elements_miniscript::psbt::PsbtExt;
 use elements_miniscript::{psbt, BtcDescriptor, ForEachKey};
 use elements_miniscript::{
     ConfidentialDescriptor, DefiniteDescriptorKey, Descriptor, DescriptorPublicKey,
 };
+
 use fxhash::FxHasher;
 use lwk_common::{burn_script, pset_balance, pset_issuances, pset_signatures, PsetDetails};
 use std::cmp::Ordering;
@@ -759,6 +765,36 @@ impl Wollet {
     pub fn never_scanned(&self) -> bool {
         self.store.cache.tip == (0, BlockHash::all_zeros())
     }
+
+    pub fn create_htlc(&self, receiver_pubkey: bitcoin::PublicKey, owner_pubkey: bitcoin::PublicKey, timeout: u32, seed_hash: Option<Vec<u8>>) -> Result<HTLC, Error> {
+
+        let mut seed: Option<Vec<u8>> = None;
+        let seedhash: Vec<u8> = match seed_hash {
+            Some(seedhash) => {
+                if seedhash.len() != 32 {
+                    return Err(Error::Generic("Seed hash must be 32 bytes long".to_string()));
+                }
+                seedhash
+            }
+            None => {
+                let mut engine = sha256::Hash::engine();
+                engine.input(&rand::random::<[u8; 32]>());
+                let hash = sha256::Hash::from_engine(engine);
+                seed = Some(hash.to_byte_array().to_vec());
+                hash.hash_again().to_byte_array().to_vec()
+            }
+        };
+
+        let htlc_script = create_htlc_script(receiver_pubkey, owner_pubkey, timeout, &seedhash).unwrap();
+        let address = Address::p2sh(&htlc_script, None, self.config.network().address_params()).to_string();
+
+        Ok(HTLC {
+            address,
+            redeem_script: htlc_script.to_bytes(),
+            seed_hash: seedhash,
+            seed
+        })
+    }
 }
 
 fn tx_balance(
@@ -865,6 +901,25 @@ fn tx_outputs(
         .collect()
 }
 
+fn create_htlc_script(receiver_pubkey: bitcoin::PublicKey, owner_pubkey: bitcoin::PublicKey, timeout: u32, seedhash: &Vec<u8>) -> Result <elements::Script, Error> {
+    let htlc = Builder::new()
+                        .push_opcode(OP_IF)
+                        .push_opcode(OP_SHA256)
+                        .push_slice(seedhash)
+                        .push_opcode(OP_EQUALVERIFY)
+                        .push_key(&receiver_pubkey)
+                        .push_opcode(OP_ELSE)
+                        .push_int(timeout as i64)
+                        .push_opcode(OP_CSV)
+                        .push_opcode(OP_DROP)
+                        .push_key(&owner_pubkey)
+                        .push_opcode(OP_ENDIF)
+                        .push_opcode(OP_CHECKSIG)
+                        .into_script();
+
+    Ok (htlc)
+}
+
 /// Blockchain tip
 pub struct Tip {
     height: Height,
@@ -895,6 +950,8 @@ mod tests {
     use crate::elements::bitcoin::network::Network;
     use crate::elements::AddressParams;
     use crate::NoPersist;
+    use elements::hashes::hex::FromHex;
+    use elements_miniscript::elements::bitcoin::hashes::{sha256, Hash as ElementsHash, HashEngine};
     use elements_miniscript::confidential::bare::tweak_private_key;
     use elements_miniscript::confidential::Key;
     use elements_miniscript::descriptor::checksum::desc_checksum;
@@ -1089,5 +1146,41 @@ mod tests {
         let addr = wollet.pegin_address(Some(0), fed_desc).unwrap();
         assert_eq!(addr.tweak_index(), 0);
         assert_eq!(addr.address().to_string(), lwk_test_util::PEGIN_TEST_ADDR);
+    }
+
+    #[test]
+    fn test_wollet_create_htlc() {
+        let exp = "ct(slip77(9c8e4f05c7711a98c838be228bcb84924d4570ca53f35fa1c793e58841d47023),elwpkh([73c5da0a/84'/1'/0']tpubDC8msFGeGuwnKG9Upg7DM2b4DaRqg3CUZa5g8v2SRQ6K4NSkxUgd7HsL2XVWbVm39yBA4LAxysQAm397zwQSQoQgewGiYZqrA9DsP4zbQ1M/<0;1>/*))";
+        let wollet = new_wollet(exp);
+
+        let receiver_pubkey = bitcoin::PublicKey::from_str("028af0e1d6ff3bb43c8161eb73ff91759a83dea9b9cbce9b60f09c8cc5cf880d0d").unwrap();
+        let owner_pubkey = bitcoin::PublicKey::from_str("02e6aaef17549e6a375d0dd305b618a2d58168caadc9fd5e59f2b2b84368f73adf").unwrap();
+        let seed_hash = Vec::from_hex("ed80f84ab619dadac421242053e794cf30781d65d6ce6ff509f75badbb688b3e").unwrap();
+        let htlc = wollet.create_htlc(receiver_pubkey, owner_pubkey, 10, Some(seed_hash));
+
+        let result = htlc.unwrap();
+
+        assert_eq!(result.address, "2M4CKbjEmJDdGgrM7TkBRubVPxN9efb495W");
+        assert_eq!(result.redeem_script, Vec::from_hex("63a820ed80f84ab619dadac421242053e794cf30781d65d6ce6ff509f75badbb688b3e8821028af0e1d6ff3bb43c8161eb73ff91759a83dea9b9cbce9b60f09c8cc5cf880d0d675ab2752102e6aaef17549e6a375d0dd305b618a2d58168caadc9fd5e59f2b2b84368f73adf68ac").unwrap());
+        assert_eq!(result.seed_hash, Vec::from_hex("ed80f84ab619dadac421242053e794cf30781d65d6ce6ff509f75badbb688b3e").unwrap());
+    }
+
+    #[test]
+    fn test_wollet_create_htlc_without_seed() {
+        let exp = "ct(slip77(9c8e4f05c7711a98c838be228bcb84924d4570ca53f35fa1c793e58841d47023),elwpkh([73c5da0a/84'/1'/0']tpubDC8msFGeGuwnKG9Upg7DM2b4DaRqg3CUZa5g8v2SRQ6K4NSkxUgd7HsL2XVWbVm39yBA4LAxysQAm397zwQSQoQgewGiYZqrA9DsP4zbQ1M/<0;1>/*))";
+        let wollet = new_wollet(exp);
+
+        let receiver_pubkey = bitcoin::PublicKey::from_str("028af0e1d6ff3bb43c8161eb73ff91759a83dea9b9cbce9b60f09c8cc5cf880d0d").unwrap();
+        let owner_pubkey = bitcoin::PublicKey::from_str("02e6aaef17549e6a375d0dd305b618a2d58168caadc9fd5e59f2b2b84368f73adf").unwrap();
+        let htlc = wollet.create_htlc(receiver_pubkey, owner_pubkey, 10, None);
+
+        let result = htlc.unwrap();
+
+        assert!(result.seed.is_some());
+
+        let mut engine = sha256::Hash::engine();
+        engine.input(&result.seed.unwrap());
+        let hash = sha256::Hash::from_engine(engine);
+        assert_eq!(result.seed_hash, hash.to_byte_array().to_vec());
     }
 }

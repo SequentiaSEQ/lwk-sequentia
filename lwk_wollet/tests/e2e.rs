@@ -997,9 +997,9 @@ async fn test_esplora_wasm_waterfalls() {
     let mut wollets = vec![];
     for waterfalls in [true, false] {
         let start = Instant::now();
-        let mut wollet = Wollet::without_persist(ElementsNetwork::Liquid, desc.clone()).unwrap();
+        let mut wollet = Wollet::without_persist(ElementsNetwork::Sequentia, desc.clone()).unwrap();
         let mut client =
-            clients::asyncr::EsploraClient::new(ElementsNetwork::Liquid, url, waterfalls);
+            clients::asyncr::EsploraClient::new(ElementsNetwork::Sequentia, url, waterfalls);
         let update = client.full_scan(&wollet).await.unwrap().unwrap();
         wollet.apply_update(update).unwrap();
         let first_scan = start.elapsed();
@@ -1294,7 +1294,7 @@ fn test_fetch_full_header_regtest() {
 fn test_fetch_full_header_mainnet() {
     let electrum_url = ElectrumUrl::new(LIQUID_SOCKET, true, true).unwrap();
     let electrum_client = ElectrumClient::new(&electrum_url).unwrap();
-    test_fetch_last_full_header(electrum_client, ElementsNetwork::Liquid);
+    test_fetch_last_full_header(electrum_client, ElementsNetwork::Sequentia);
 }
 
 #[test]
