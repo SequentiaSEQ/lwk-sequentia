@@ -18,6 +18,13 @@ receiver_pubkey = "028af0e1d6ff3bb43c8161eb73ff91759a83dea9b9cbce9b60f09c8cc5cf8
 owner_pubkey = "02e6aaef17549e6a375d0dd305b618a2d58168caadc9fd5e59f2b2b84368f73adf"
 seed_hash = "ed80f84ab619dadac421242053e794cf30781d65d6ce6ff509f75badbb688b3e"
 
-
 htlc = wollet.create_htlc(receiver_pubkey, owner_pubkey, 10, seed_hash)
+print(htlc)
+assert(htlc.address() == "2M4CKbjEmJDdGgrM7TkBRubVPxN9efb495W")
+assert(htlc.redeem_script().hex() == "63a820ed80f84ab619dadac421242053e794cf30781d65d6ce6ff509f75badbb688b3e8821028af0e1d6ff3bb43c8161eb73ff91759a83dea9b9cbce9b60f09c8cc5cf880d0d675ab2752102e6aaef17549e6a375d0dd305b618a2d58168caadc9fd5e59f2b2b84368f73adf68ac")
+assert(htlc.seed_hash().hex() == "ed80f84ab619dadac421242053e794cf30781d65d6ce6ff509f75badbb688b3e")
+assert(htlc.seed() is None)
 
+htlc = wollet.create_htlc(receiver_pubkey, owner_pubkey, 10, None)
+
+assert(htlc.seed() is not None)

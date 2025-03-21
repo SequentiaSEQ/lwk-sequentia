@@ -1163,6 +1163,7 @@ mod tests {
         assert_eq!(result.address, "2M4CKbjEmJDdGgrM7TkBRubVPxN9efb495W");
         assert_eq!(result.redeem_script, Vec::from_hex("63a820ed80f84ab619dadac421242053e794cf30781d65d6ce6ff509f75badbb688b3e8821028af0e1d6ff3bb43c8161eb73ff91759a83dea9b9cbce9b60f09c8cc5cf880d0d675ab2752102e6aaef17549e6a375d0dd305b618a2d58168caadc9fd5e59f2b2b84368f73adf68ac").unwrap());
         assert_eq!(result.seed_hash, Vec::from_hex("ed80f84ab619dadac421242053e794cf30781d65d6ce6ff509f75badbb688b3e").unwrap());
+        assert_eq!(result.seed, None)
     }
 
     #[test]

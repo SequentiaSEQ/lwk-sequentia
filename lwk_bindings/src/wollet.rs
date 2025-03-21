@@ -1,35 +1,17 @@
 use elements::bitcoin::PublicKey;
-use elements::hashes::hex::FromHex;
+use elements::hashes::hex:: FromHex;
 use lwk_wollet::NoPersist;
 
 use crate::desc::WolletDescriptor;
 use crate::network::Network;
 use crate::types::AssetId;
-use crate::{AddressResult, ForeignPersisterLink, LwkError, Pset, Txid, Update, WalletTx};
-use std::fmt;
+use crate::{AddressResult, ForeignPersisterLink, HTLCScript, LwkError, Pset, Txid, Update, WalletTx};
 use std::str::FromStr;
 use std::sync::{MutexGuard, PoisonError};
 use std::{
     collections::HashMap,
     sync::{Arc, Mutex},
 };
-
-#[derive(uniffi::Object, PartialEq, Eq, Debug)]
-pub struct HTLCScript {
-    inner: lwk_wollet::HTLC,
-}
-
-impl From<lwk_wollet::HTLC> for HTLCScript {
-    fn from(inner: lwk_wollet::HTLC) -> Self {
-        Self { inner }
-    }
-}
-
-impl fmt::Display for HTLCScript {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}", self.inner)
-    }
-}
 
 /// A Watch-Only wallet, wrapper over [`lwk_wollet::Wollet`]
 #[derive(uniffi::Object)]
