@@ -505,6 +505,9 @@ pub enum WalletCommand {
         /// Fee rate to use
         #[arg(long)]
         fee_rate: Option<f32>,
+
+        /// The asset to use for the fee
+        fee_asset: Option<String>,
     },
 
     /// Drain the wallet of the policy asset

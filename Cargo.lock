@@ -1016,8 +1016,7 @@ dependencies = [
 [[package]]
 name = "elements"
 version = "0.25.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "81b2569d3495bfdfce36c504fd4d78752ff4a7699f8a33e6f3ee523bddf9f6ad"
+source = "git+https://github.com/SequentiaSEQ/rust-sequentia?branch=sequentia-testnet#73524fcb5f6da5d3cb3307f990099db65c042361"
 dependencies = [
  "bech32 0.11.0",
  "bitcoin",
@@ -1029,8 +1028,7 @@ dependencies = [
 [[package]]
 name = "elements-miniscript"
 version = "0.4.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "571fa105690f83c7833df2109eb2e14ca0e62d633d2624ffcb166ff18a3da870"
+source = "git+https://github.com/SequentiaSEQ/sequentia-miniscript?branch=sequentia-testnet#676970f574e055a6429e8e0bcbcc5273d660f9e7"
 dependencies = [
  "bitcoin",
  "elements",

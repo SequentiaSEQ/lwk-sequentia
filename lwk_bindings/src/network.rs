@@ -66,7 +66,7 @@ impl Network {
     pub fn default_electrum_client(&self) -> Result<Arc<ElectrumClient>, LwkError> {
         let (url, validate_domain, tls) = match &self.inner {
             lwk_wollet::ElementsNetwork::Liquid => (LIQUID_SOCKET, true, true),
-            lwk_wollet::ElementsNetwork::LiquidTestnet => (LIQUID_TESTNET_SOCKET, true, true),
+            lwk_wollet::ElementsNetwork::LiquidTestnet => (LIQUID_TESTNET_SOCKET, false, false),
             lwk_wollet::ElementsNetwork::ElementsRegtest { policy_asset: _ } => {
                 ("127.0.0.1:50002", false, false)
             }
@@ -79,7 +79,7 @@ impl Network {
         let url = match &self.inner {
             lwk_wollet::ElementsNetwork::Liquid => "https://blockstream.info/liquid/api",
             lwk_wollet::ElementsNetwork::LiquidTestnet => {
-                "https://blockstream.info/liquidtestnet/api"
+                "http://explorer.sequentia.io/testnet/api"
             }
             lwk_wollet::ElementsNetwork::ElementsRegtest { policy_asset: _ } => "127.0.0.1:3000",
         };

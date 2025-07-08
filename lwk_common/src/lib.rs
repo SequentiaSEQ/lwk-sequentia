@@ -53,7 +53,7 @@ use std::collections::btree_map::BTreeMap;
 
 pub mod electrum_ssl {
     pub const LIQUID_SOCKET: &str = "elements-mainnet.blockstream.info:50002";
-    pub const LIQUID_TESTNET_SOCKET: &str = "elements-testnet.blockstream.info:50002";
+    pub const LIQUID_TESTNET_SOCKET: &str = "explorer.sequentia.io:51101";
 }
 
 pub fn derive_script_pubkey(
